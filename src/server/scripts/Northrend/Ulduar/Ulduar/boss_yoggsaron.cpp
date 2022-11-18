@@ -78,6 +78,7 @@ enum YoggSpells
     SPELL_BRAIN_LINK                    = 63802,
     SPELL_BRAIN_LINK_DAMAGE             = 63803,
     SPELL_BRAIN_LINK_OK                 = 63804,
+    SPELL_DEATH_RAY_SUMMON              = 63891,                    // summons npc 33882
 
     SPELL_DEATH_RAY_DAMAGE_VISUAL       = 63886,
     SPELL_DEATH_RAY_ORIGIN_VISUAL       = 63893,
@@ -189,6 +190,7 @@ enum NPCsGOs
     NPC_CORRUPTOR_TENTACLE              = 33985, // 30-40 secs ?
 
     NPC_INFLUENCE_TENTACLE              = 33943,
+    NPC_DEATH_RAY                       = 33881,
     NPC_DEATH_ORB                       = 33882,
     NPC_DESCEND_INTO_MADNESS            = 34072,
     NPC_LAUGHING_SKULL                  = 33990,
@@ -376,6 +378,35 @@ public:
             }
             else if (cr->GetEntry() == NPC_SANITY_WELL)
                 cr->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_SCALE, true);
+
+            switch (cr->GetEntry())
+            {
+                case NPC_DEATH_ORB:
+                {
+					me->SetReactState(REACT_PASSIVE);
+                    // the death orb is linked to 4 death rays that are randomly moving on the ground
+                    float fX, fY, fZ;
+                    for (uint8 i = 0; i < 4; ++i)
+                    {
+                        float fDist = float(urand(30, 45));
+                        float fAng = rand_norm() * 2 * M_PI;
+                        me->GetNearPoint(me, fX, fY, fZ, 0, fDist, fAng);
+                        float Zplus = (fDist - 38) / 6.5f;
+                        me->SummonCreature(NPC_DEATH_RAY, fX, fY, 327.2 + Zplus, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
+                    }
+
+                    cr->CastSpell(cr, SPELL_DEATH_RAY_ORIGIN_VISUAL, true);
+                    break;
+                }
+                case NPC_DEATH_RAY:
+                {
+                    cr->CastSpell(cr, SPELL_DEATH_RAY_WARNING, true);
+					cr->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+					cr->DisableRotate(false);
+					cr->ClearUnitState(UNIT_STATE_ROOT);
+					cr->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT | MOVEMENTFLAG_PENDING_ROOT);
+                }
+            }
         }
 
         void SpawnClouds()
@@ -418,7 +449,8 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 me->DisableRotate(false);
                 me->ClearUnitState(UNIT_STATE_ROOT);
-            }
+				me->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT | MOVEMENTFLAG_PENDING_ROOT);
+			}
             else
             {
                 me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
@@ -542,15 +574,17 @@ public:
             }
         }
 
-        void SummonDeathOrbs()
+		void SummonDeathOrb()
         {
+            me->CastSpell(1980.43f, -25.7708f, 351.5418f, SPELL_DEATH_RAY_SUMMON, true);
+            /*
             for (uint8 i = 0; i < 4; ++i)
             {
                 uint32 dist = urand(38, 48);
                 float o = rand_norm() * M_PI * 2;
                 float Zplus = (dist - 38) / 6.5f;
                 me->SummonCreature(NPC_DEATH_ORB, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
-            }
+            }*/
         }
 
         void AddPortals()
@@ -802,6 +836,8 @@ public:
                     }
                 case EVENT_SARA_P2_START:
                     {
+                        if (Creature* yogg = GetClosestCreatureWithEntry(me, NPC_YOGG_SARON, 30.f))
+                            me->CastSpell(yogg, 61791, true);
                         EntryCheckPredicate pred(NPC_YOGG_SARON);
                         summons.DoAction(ACTION_YOGG_SARON_APPEAR, pred);
                         events.RescheduleEvent(EVENT_SARA_P2_SPAWN_START_TENTACLES, 500, 0, EVENT_PHASE_TWO);
@@ -820,7 +856,7 @@ public:
                     events.RepeatEvent(3500);
                     break;
                 case EVENT_SARA_P2_DEATH_RAY:
-                    SummonDeathOrbs();
+                    SummonDeathOrb();
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SARA_P2_SUMMON_T1: // CRUSHER
@@ -855,10 +891,15 @@ public:
                     }
                 case EVENT_SARA_P2_SPAWN_START_TENTACLES:
                     me->SetOrientation(M_PI);
-                    me->SetDisplayId(SARA_TRANSFORM_MODEL);
+//                    me->SetDisplayId(SARA_TRANSFORM_MODEL);
 
-                    me->SendMonsterMove(me->GetPositionX(), me->GetPositionY(), 355, 2000, SPLINEFLAG_FLYING);
-                    me->SetPosition(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
+//                    me->SendMonsterMove(1980.28f, -25.5868f, 355, 2000, SPLINEFLAG_FLYING);
+//                    me->SetPosition(1980.28f, -25.5868f, 355, me->GetOrientation());
+					me->CastSpell(me, 64775, true);
+                    me->CastSpell(me, 43978, true);
+                    me->CastSpell(me, 65157, true);
+                    if (Creature* yogg = GetClosestCreatureWithEntry(me, NPC_YOGG_SARON, 30.f))
+                        me->CastSpell(yogg, 61791, true);
 
                     SpawnTentacle(NPC_CRUSHER_TENTACLE);
                     SpawnTentacle(NPC_CONSTRICTOR_TENTACLE);
@@ -1442,19 +1483,19 @@ public:
     };
 };
 
-class boss_yoggsaron_death_orb : public CreatureScript
+class boss_yoggsaron_death_ray : public CreatureScript
 {
 public:
-    boss_yoggsaron_death_orb() : CreatureScript("boss_yoggsaron_death_orb") { }
+    boss_yoggsaron_death_ray() : CreatureScript("boss_yoggsaron_death_ray") { }
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return GetUlduarAI<boss_yoggsaron_death_orbAI>(pCreature);
+        return GetUlduarAI<boss_yoggsaron_death_rayAI>(pCreature);
     }
 
-    struct boss_yoggsaron_death_orbAI : public NullCreatureAI
+    struct boss_yoggsaron_death_rayAI : public NullCreatureAI
     {
-        boss_yoggsaron_death_orbAI(Creature* pCreature) : NullCreatureAI(pCreature)
+        boss_yoggsaron_death_rayAI(Creature* pCreature) : NullCreatureAI(pCreature)
         {
             me->CastSpell(me, SPELL_DEATH_RAY_WARNING, true);
             _startTimer = 1;
@@ -1475,7 +1516,11 @@ public:
                     _startTimer = 0;
                     me->SetSpeed(MOVE_WALK, 2);
                     me->SetSpeed(MOVE_RUN, 2);
-                    me->GetMotionMaster()->MoveRandom(20.0f);
+                    me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+//                    me->GetMotionMaster()->MoveRandomAroundPoint(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 10.0f);
+                    me->GetMotionMaster()->MoveRandom(20.f);
+					me->ClearUnitState(UNIT_STATE_ROOT);
+					me->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT | MOVEMENTFLAG_PENDING_ROOT);
                 }
             }
         }
@@ -3081,7 +3126,7 @@ void AddSC_boss_yoggsaron()
     new boss_yoggsaron_cloud();
     new boss_yoggsaron_guardian_of_ys();
     new boss_yoggsaron_brain();
-    new boss_yoggsaron_death_orb();
+    new boss_yoggsaron_death_ray();
     new boss_yoggsaron_crusher_tentacle();
     new boss_yoggsaron_corruptor_tentacle();
     new boss_yoggsaron_constrictor_tentacle();

@@ -18155,7 +18155,6 @@ void Unit::SetControlled(bool apply, UnitState state)
                         return;
                     }
                 }
-
                 if (HasAuraType(SPELL_AURA_MOD_ROOT) || GetVehicle())
                     return;
                 ClearUnitState(state);
