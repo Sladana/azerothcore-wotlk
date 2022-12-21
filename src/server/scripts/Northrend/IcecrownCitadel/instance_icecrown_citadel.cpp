@@ -1462,6 +1462,8 @@ public:
                 return true;
             }
 
+=======
+		return true;
             switch (bossId)
             {
                 case DATA_THE_LICH_KING:

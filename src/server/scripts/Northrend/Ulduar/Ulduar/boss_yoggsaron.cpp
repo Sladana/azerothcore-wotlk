@@ -588,14 +588,39 @@ public:
 
         void SpawnTentacle(uint32 entry)
         {
-            uint32 dist = urand(38, 48);
-            float o = rand_norm() * M_PI * 2;
-            float Zplus = (dist - 38) / 6.5f;
-            if (Creature* cr = me->SummonCreature(entry, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+            if (entry == NPC_CONSTRICTOR_TENTACLE)
             {
-                cr->CastSpell(cr, SPELL_TENTACLE_ERUPT, true);
-                cr->CastSpell(cr, SPELL_VOID_ZONE_SMALL, true);
-                cr->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                bool found = false;
+                int i = 25;
+                while (!found && i > 0)
+                {
+                    --i;
+                    if (Unit* target = SelectTargetFromPlayerList(100.0f))
+                    {
+                        if (target->GetPositionZ() > 320)
+                        {
+                            found = true;
+                            if (Creature* cr = me->SummonCreature(entry, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                            {
+                                cr->CastSpell(cr, SPELL_TENTACLE_ERUPT, true);
+                                cr->CastSpell(cr, SPELL_VOID_ZONE_SMALL, true);
+                                cr->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                uint32 dist = urand(38, 48);
+                float o = rand_norm() * M_PI * 2;
+                float Zplus = (dist - 38) / 6.5f;
+                if (Creature* cr = me->SummonCreature(entry, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                {
+                    cr->CastSpell(cr, SPELL_TENTACLE_ERUPT, true);
+                    cr->CastSpell(cr, SPELL_VOID_ZONE_SMALL, true);
+                    cr->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                }
             }
         }
 
@@ -1325,15 +1350,8 @@ public:
             me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2136.7f, 2.43262f, 239.72f, 3.90023f);
 
             // Laughing Skulls
-            if (urand(0, 1))
-                me->SummonCreature(NPC_LAUGHING_SKULL, 2139.13f, -59.0848f, 239.728f, 2.2974f);
-            else
-                me->SummonCreature(NPC_LAUGHING_SKULL, 2083, -25.66f, 244, 0);
-            if (urand(0, 1))
-                me->SummonCreature(NPC_LAUGHING_SKULL, 2066.67f, -59.8984f, 239.72f, 0.718747f);
-            else
-                me->SummonCreature(NPC_LAUGHING_SKULL, 2126.22f, -25.86f, 244, 0);
-
+            me->SummonCreature(NPC_LAUGHING_SKULL, 2139.13f, -59.0848f, 239.728f, 2.2974f);
+            me->SummonCreature(NPC_LAUGHING_SKULL, 2066.67f, -59.8984f, 239.72f, 0.718747f);
             me->SummonCreature(NPC_LAUGHING_SKULL, 2133.09f, 15.341f, 239.72f, 4.0724f);
             me->SummonCreature(NPC_LAUGHING_SKULL, 2065.83f, 12.3772f, 239.792f, 5.49789f);
 
@@ -1351,18 +1369,9 @@ public:
         {
             // Laughing Skulls
             me->SummonCreature(NPC_LAUGHING_SKULL, 1931.12f, -92.702f, 239.991f, 5.2819f);
-            if (urand(0, 1))
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1969.88f, -147.729f, 239.991f, 2.37593f);
-            else
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1878, -93.3f, 240, 0);
-            if (urand(0, 1))
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1950.78f, -167.902f, 239.991f, 2.34844f);
-            else
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1938.45f, -116.5f, 240, 0);
-            if (urand(0, 1))
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1896.45f, -141.469f, 239.991f, 6.12227f);
-            else
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1921, -158, 240, 0);
+            me->SummonCreature(NPC_LAUGHING_SKULL, 1969.88f, -147.729f, 239.991f, 2.37593f);
+            me->SummonCreature(NPC_LAUGHING_SKULL, 1950.78f, -167.902f, 239.991f, 2.34844f);
+            me->SummonCreature(NPC_LAUGHING_SKULL, 1896.45f, -141.469f, 239.991f, 6.12227f);
 
             // Influence
             me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1958.29f, -128.65f, 239.99f, 3.61293f);
@@ -1384,16 +1393,9 @@ public:
         void PrepareStormwindIllusion()
         {
             // Laughing Skulls
-            if (urand(0, 1))
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1916.36f, 28.05f, 239.666f, 1.30238f);
-            else
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1966.7f, 57.8f, 239.66f, 0);
-            if (urand(0, 1))
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1902, 75.1362f, 239.666f, 6.06189f);
-            else
-                me->SummonCreature(NPC_LAUGHING_SKULL, 1933, 91, 240, 0);
-            me->SummonCreature(NPC_LAUGHING_SKULL, 1914.42f, 90.8465f, 239.666f, 5.25294f);
-            me->SummonCreature(NPC_LAUGHING_SKULL, 1963.68f, 89.7549f, 239.667f, 3.70571f);
+            me->SummonCreature(NPC_LAUGHING_SKULL, 1955.173f, 85.26153f, 239.7496f, 4.049f);
+            me->SummonCreature(NPC_LAUGHING_SKULL, 1893.146f, 44.24343f, 239.7496f, 0);
+            me->SummonCreature(NPC_LAUGHING_SKULL, 1944.962f, 65.25938f, 240.4596f, 0);
 
             // Influence
             me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1931.41f, 39.0711f, 239.66f, 1.82467f);
@@ -1578,7 +1580,7 @@ public:
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType damagetype, SpellSchoolMask) override
         {
-            if (who && damagetype == DIRECT_DAMAGE)
+            if (who && damagetype == DIRECT_DAMAGE && me->IsWithinMeleeRange(who))
             {
                 DoResetThreatList();
                 me->AddThreat(who, 100000);
@@ -1644,7 +1646,7 @@ public:
             uint8 count = 0;
             for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr, ++count)
             {
-                if (me->GetDistance(itr->GetSource()) > 200 || itr->GetSource()->GetPositionZ() < 300 || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+                if (me->GetDistance(itr->GetSource()) > 200 || itr->GetSource()->GetPositionZ() < 322 || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                     continue;
 
                 if (count <= num || !target)
@@ -2693,7 +2695,13 @@ public:
             std::list<WorldObject*> tmplist;
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                 if ((*itr)->IsPlayer() && !(*itr)->ToPlayer()->HasAuraType(SPELL_AURA_AOE_CHARM) && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
+=======
+                if ((*itr)->HasInArc(M_PI, GetCaster()))
+                {
+                    if (GetSpellInfo()->Id == 64168 && (*itr)->GetPositionZ() > 320)
+                        continue;
                     tmplist.push_back(*itr);
+                }
 
             targets.clear();
             for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
@@ -2796,6 +2804,17 @@ public:
     {
         PrepareSpellScript(spell_yogg_saron_sanity_reduce_SpellScript);
 
+		void HandleHealthEffect()
+        {
+            if (GetSpellInfo()->Id != SPELL_INDUCE_MADNESS)
+                return;
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+            if(Creature* yogg = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript()->GetGuidData(NPC_YOGG_SARON)))
+                yogg->SetHealth(yogg->GetMaxHealth() * (caster->GetHealthPct() / 100.f));
+        }
+
         void HandleScriptEffect(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
@@ -2848,6 +2867,7 @@ public:
         void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_sanity_reduce_SpellScript::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
+            AfterCast += SpellCastFn(spell_yogg_saron_sanity_reduce_SpellScript::HandleHealthEffect);
         }
     };
 

@@ -253,7 +253,7 @@ public:
                         me->SetGuidValue(UNIT_FIELD_TARGET, me->GetVictim()->GetGUID());
                     break;
                 case EVENT_SPELL_SEARING_FLAMES:
-                    if(!me->HasAura(SPELL_SARONITE_BARRIER))
+                    if(!me->HasAura(SPELL_SARONITE_BARRIER) || me->GetMap()->Is25ManRaid())
                         me->CastSpell(me->GetVictim(), SPELL_SEARING_FLAMES, false);
                     events.Repeat(me->GetMap()->Is25ManRaid() ? 8s : 15s);
                     break;
