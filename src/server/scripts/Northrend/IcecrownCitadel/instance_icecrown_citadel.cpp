@@ -1406,6 +1406,7 @@ public:
 
         bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const override
         {
+		return true;
             switch (bossId)
             {
                 case DATA_THE_LICH_KING:

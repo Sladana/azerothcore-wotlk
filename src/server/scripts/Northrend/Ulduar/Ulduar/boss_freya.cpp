@@ -633,12 +633,25 @@ public:
                     events.RepeatEvent(45000 + urand(0, 10000));
                     break;
                 case EVENT_FREYA_UNSTABLE_SUN_BEAM:
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    if (Is25ManRaid())
-                    {
-                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    }
+				Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+uint32 raidsize = 0;
+for (auto itr = pList.begin(); itr != pList.end(); ++itr)
+  ++raidsize;
+for (int j = 0; j < (Is25ManRaid() ? 3 : 1); j++)
+{
+    int rnd = urand(0, raidsize);
+    auto itr = pList.begin();
+    for (int i = 0; itr != pList.end(); i++)
+    {
+        if (itr->GetSource() && itr->GetSource()->IsAlive() && i >= rnd)
+            break;
+        ++itr;
+    }
+    if (itr == pList.end() || !itr->GetSource())
+        continue;
+    auto target = itr->GetSource();
+    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+}
                     events.RepeatEvent(38000 + urand(0, 10000));
                     break;
             }
@@ -1158,7 +1171,8 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_ANCIENT_CONSERVATOR_NATURE_FURY:
-                    me->CastSpell(me->GetVictim(), SPELL_NATURE_FURY, false);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                    me->CastSpell(target, SPELL_NATURE_FURY, false);
                     events.RepeatEvent(14000);
                     break;
                 case EVENT_ANCIENT_CONSERVATOR_GRIP:

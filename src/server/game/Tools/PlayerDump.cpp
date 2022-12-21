@@ -942,6 +942,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
             break;
         }
 
+	ChangeColumn(ts, line, "at_login", "8");
         FixNULLfields(line);
 
         trans->Append(line.c_str());
