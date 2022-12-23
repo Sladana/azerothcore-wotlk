@@ -1540,13 +1540,9 @@ public:
                     me->CastSpell(me, SPELL_DEATH_RAY_DAMAGE, true);
 
                     _startTimer = 0;
-                    me->SetSpeed(MOVE_WALK, 2);
-                    me->SetSpeed(MOVE_RUN, 2);
-                    me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
-//                    me->GetMotionMaster()->MoveRandomAroundPoint(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 10.0f);
+                    me->SetSpeed(MOVE_WALK, 1);
+                    me->SetSpeed(MOVE_RUN, 1);
                     me->GetMotionMaster()->MoveRandom(20.f);
-					me->ClearUnitState(UNIT_STATE_ROOT);
-					me->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT | MOVEMENTFLAG_PENDING_ROOT);
                 }
             }
         }
@@ -2804,15 +2800,17 @@ public:
     {
         PrepareSpellScript(spell_yogg_saron_sanity_reduce_SpellScript);
 
-		void HandleHealthEffect()
+        void HandleHealthEffect()
         {
             if (GetSpellInfo()->Id != SPELL_INDUCE_MADNESS)
                 return;
             Unit* caster = GetCaster();
             if (!caster)
                 return;
-            if(Creature* yogg = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript()->GetGuidData(NPC_YOGG_SARON)))
-                yogg->SetHealth(yogg->GetMaxHealth() * (caster->GetHealthPct() / 100.f));
+            if(Creature* yogg = ObjectAccessor::GetCreature(*caster, caster->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON)))
+            {
+                yogg->SetHealth(yogg->CountPctFromMaxHealth(caster->GetHealthPct()));
+            }
         }
 
         void HandleScriptEffect(SpellEffIndex effIndex)

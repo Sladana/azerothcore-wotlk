@@ -3517,6 +3517,8 @@ float Creature::GetAttackDistance(Unit const* player) const
 bool Creature::IsMovementPreventedByCasting() const
 {
     Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL];
+    if (spell && spell->GetSpellInfo()->Id == 63886)
+        return false;
     // first check if currently a movement allowed channel is active and we're not casting
     if (spell && spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsActionAllowedChannel())
     {
