@@ -43,8 +43,8 @@ Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) 
     }
 
     // Ulduar demolisher
-    if (vehInfo->m_ID == 338)
-        ++_usableSeatNum;
+ //   if (vehInfo->m_ID == 338)
+ //       ++_usableSeatNum;
 
     InitMovementInfoForBase();
 }

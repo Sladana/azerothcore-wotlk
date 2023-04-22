@@ -2755,6 +2755,7 @@ void ObjectMgr::LoadItemTemplates()
         ItemTemplate& itemTemplate = _itemTemplateStore[entry];
 
         itemTemplate.ItemId                    = entry;
+		itemTemplate.ItemSet        		   = fields[113].Get<uint32>();
         itemTemplate.Class                     = uint32(fields[1].Get<uint8>());
         itemTemplate.SubClass                  = uint32(fields[2].Get<uint8>());
         itemTemplate.SoundOverrideSubclass     = int32(fields[3].Get<int8>());
@@ -2782,11 +2783,179 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Stackable                 = fields[25].Get<int32>();
         itemTemplate.ContainerSlots            = uint32(fields[26].Get<uint8>());
         itemTemplate.StatsCount                = uint32(fields[27].Get<uint8>());
+		itemTemplate.RequiredCityRank          = fields[21].Get<uint32>();
+        itemTemplate.RequiredReputationFaction = uint32(fields[22].Get<uint16>());
+        itemTemplate.RequiredReputationRank    = uint32(fields[23].Get<uint16>());
+        itemTemplate.MaxCount                  = fields[24].Get<int32>();
+        itemTemplate.Stackable                 = fields[25].Get<int32>();
+        itemTemplate.ContainerSlots            = uint32(fields[26].Get<uint8>());
+        itemTemplate.StatsCount                = uint32(fields[27].Get<uint8>());
+		
+        float multi = 1.f;
+
+        switch (itemTemplate.ItemId)
+        {
+case 45293:
+case 45295:
+case 45297:
+case 45300:
+case 45447:
+case 45455:
+case 45456:
+case 45867:
+case 45869:
+case 45871:
+case 45928:
+case 45929:
+case 45931:
+case 45933:
+case 45943:
+case 45945:
+case 45946:
+case 45982:
+case 45988:
+case 45989:
+case 45993:
+case 46032:
+case 46034:
+case 46037:
+case 46038:
+case 46039:
+case 46040:
+case 46041:
+case 46042:
+case 46043:
+case 46044:
+case 46045:
+case 46046:
+case 46047:
+case 46048:
+case 46049:
+case 46050:
+case 46051:
+case 46068:
+case 46095:
+case 46096:
+case 46312:
+case 45457:
+case 45460:
+case 45459:
+case 45462:
+case 45612:
+case 45461:
+case 45888:
+case 45876:
+case 45886:
+case 45887:
+case 45877:
+case 45294:
+case 45296:
+case 45448:
+case 45449:
+case 45868:
+case 45870:
+case 45930:
+case 45947:
+case 45990:
+case 46033:
+case 46035:
+case 46036:
+case 46067:
+case 46097:
+case 45618:
+case 45608:
+case 45614:
+case 45588:
+case 45132:
+case 45133:
+case 45134:
+case 45135:
+case 45136:
+case 45241:
+case 45242:
+case 45243:
+case 45244:
+case 45245:
+case 45442:
+case 45443:
+case 45444:
+case 45445:
+case 45446:
+case 45470:
+case 45471:
+case 45472:
+case 45473:
+case 45474:
+case 45484:
+case 45485:
+case 45486:
+case 45487:
+case 45488:
+case 45494:
+case 45495:
+case 45496:
+case 45497:
+case 45516:
+case 45517:
+case 45518:
+case 45519:
+case 45520:
+case 45533:
+case 45534:
+case 45535:
+case 45536:
+case 45537:
+case 45570:
+case 45587:
+case 45594:
+case 45599:
+case 45607:
+case 45609:
+case 45610:
+case 45611:
+case 45613:
+case 45615:
+case 45616:
+case 45617:
+case 45619:
+case 45620:
+case 45663:
+case 45665:
+case 46320:
+case 46321:
+case 46322:
+case 46323:
+case 46017:
+            {
+                float modifier = 13.f;
+                //multi = (itemTemplate.ItemLevel + modifier) / itemTemplate.ItemLevel;
+                multi = 1.13f;
+                itemTemplate.ItemLevel = itemTemplate.ItemLevel + modifier;
+            }
+        }
+
+        switch (itemTemplate.ItemLevel)
+        {
+            case 219:
+            case 226:
+            case 232:
+            case 239:
+            {
+                if (multi != 1.f)
+                    break;
+                float modifier = 6.f;
+                //multi = (itemTemplate.ItemLevel + modifier) / itemTemplate.ItemLevel;
+                multi = 1.06f;
+                itemTemplate.ItemLevel = itemTemplate.ItemLevel + modifier;
+            }
+        }
+		
+
 
         for (uint8 i = 0; i < itemTemplate.StatsCount; ++i)
         {
             itemTemplate.ItemStat[i].ItemStatType  = uint32(fields[28 + i * 2].Get<uint8>());
-            itemTemplate.ItemStat[i].ItemStatValue = fields[29 + i * 2].Get<int32>();
+            itemTemplate.ItemStat[i].ItemStatValue = int32(std::round((fields[29 + i * 2].Get<int32>()) * multi));
         }
 
         itemTemplate.ScalingStatDistribution = uint32(fields[48].Get<uint16>());
@@ -2794,12 +2963,12 @@ void ObjectMgr::LoadItemTemplates()
 
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
         {
-            itemTemplate.Damage[i].DamageMin  = fields[50 + i * 3].Get<float>();
-            itemTemplate.Damage[i].DamageMax  = fields[51 + i * 3].Get<float>();
+            itemTemplate.Damage[i].DamageMin  = fields[50 + i * 3].Get<float>() * ((multi - 1) * 0.75f + 1.f);
+            itemTemplate.Damage[i].DamageMax  = fields[51 + i * 3].Get<float>() * ((multi - 1) * 0.75f + 1.f);
             itemTemplate.Damage[i].DamageType = uint32(fields[52 + i * 3].Get<uint8>());
         }
 
-        itemTemplate.Armor          = fields[56].Get<uint32>();
+        itemTemplate.Armor          = uint32(std::round(fields[56].Get<uint32>() * ((multi - 1) * 0.416666f + 1.f)));
         itemTemplate.HolyRes        = fields[57].Get<int32>();
         itemTemplate.FireRes        = fields[58].Get<int32>();
         itemTemplate.NatureRes      = fields[59].Get<int32>();
@@ -2926,6 +3095,7 @@ void ObjectMgr::LoadItemTemplates()
 
             if (itemTemplate.Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY)
                 LOG_ERROR("sql.sql", "Item (Entry: {}) has value ({}) in `Flags2` flags (ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) and ITEM_FLAGS_EXTRA_HORDE_ONLY ({}) in Flags field, this is a wrong combination.",
+								 
                                  entry, ITEM_FLAGS_EXTRA_ALLIANCE_ONLY, ITEM_FLAGS_EXTRA_HORDE_ONLY);
         }
         else if (itemTemplate.Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY)

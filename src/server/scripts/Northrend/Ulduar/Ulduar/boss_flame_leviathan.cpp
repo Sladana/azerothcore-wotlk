@@ -2032,8 +2032,8 @@ public:
                     {
                         if (!veh2->GetPassenger(0))
                             target2->HandleSpellClick(GetCaster());
-
-                        return SPELL_FAILED_DONT_REPORT;
+                        else
+                            return SPELL_FAILED_DONT_REPORT;
                     }
 
             return SPELL_CAST_OK;
