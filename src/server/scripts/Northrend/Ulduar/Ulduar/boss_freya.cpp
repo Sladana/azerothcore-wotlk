@@ -640,7 +640,6 @@ public:
                         me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                     }
                     events.Repeat(38s, 48s);
-=======
 				Map::PlayerList const& pList = me->GetMap()->GetPlayers();
 uint32 raidsize = 0;
 for (auto itr = pList.begin(); itr != pList.end(); ++itr)
@@ -1181,7 +1180,6 @@ public:
                 case EVENT_ANCIENT_CONSERVATOR_NATURE_FURY:
                     me->CastSpell(me->GetVictim(), SPELL_NATURE_FURY, false);
                     events.Repeat(14s);
-=======
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     me->CastSpell(target, SPELL_NATURE_FURY, false);
                     events.RepeatEvent(14000);

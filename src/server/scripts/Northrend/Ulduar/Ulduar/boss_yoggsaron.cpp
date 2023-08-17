@@ -2690,8 +2690,6 @@ public:
         {
             std::list<WorldObject*> tmplist;
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if ((*itr)->IsPlayer() && !(*itr)->ToPlayer()->HasAuraType(SPELL_AURA_AOE_CHARM) && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
-=======
                 if ((*itr)->HasInArc(M_PI, GetCaster()))
                 {
                     if (GetSpellInfo()->Id == 64168 && (*itr)->GetPositionZ() > 320)

@@ -253,6 +253,8 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
+			if (GameObject* transporter = instance->GetGameObject(ScourgeTransporterFirstGUID))
+                            transporter->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
 
@@ -1457,12 +1459,11 @@ public:
 
         bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
         {
+		return true;	
             if (player && player->GetSession() && player->GetSession()->GetSecurity() >= SEC_MODERATOR)
             {
                 return true;
             }
-
-=======
 		return true;
             switch (bossId)
             {
@@ -1614,7 +1615,7 @@ public:
 
         void CheckLichKingAvailability()
         {
-            if (GetBossState(DATA_PROFESSOR_PUTRICIDE) == DONE && GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == DONE && GetBossState(DATA_SINDRAGOSA) == DONE)
+            if (true || GetBossState(DATA_PROFESSOR_PUTRICIDE) == DONE && GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == DONE && GetBossState(DATA_SINDRAGOSA) == DONE)
             {
                 if (GameObject* teleporter = instance->GetGameObject(TheLichKingTeleportGUID))
                 {

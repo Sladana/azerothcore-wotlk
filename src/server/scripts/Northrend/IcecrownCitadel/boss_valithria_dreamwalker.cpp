@@ -305,8 +305,8 @@ public:
             me->SetHealth(_spawnHealth);
             me->LoadCreaturesAddon(true);
             // immune to percent heals
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_OBS_MOD_HEALTH, true);
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEAL_PCT, true);
+            // me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_OBS_MOD_HEALTH, true);
+            // me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEAL_PCT, true);
             // Glyph of Dispel Magic - not a percent heal by effect, its cast with custom basepoints
             me->ApplySpellImmune(0, IMMUNITY_ID, 56131, true);
             _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
