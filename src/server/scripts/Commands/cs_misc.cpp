@@ -98,6 +98,7 @@ public:
             { "commands",          HandleCommandsCommand,          SEC_PLAYER,             Console::Yes },
             { "die",               HandleDieCommand,               SEC_GAMEMASTER,         Console::No  },
             { "revive",            HandleReviveCommand,            SEC_GAMEMASTER,         Console::Yes },
+            { "revive all",        HandleReviveAllCommand,            SEC_GAMEMASTER,         Console::Yes },
             { "dismount",          HandleDismountCommand,          SEC_PLAYER,             Console::No  },
             { "guid",              HandleGUIDCommand,              SEC_GAMEMASTER,         Console::No  },
             { "help",              HandleHelpCommand,              SEC_PLAYER,             Console::Yes },
@@ -1104,7 +1105,7 @@ public:
         {
             auto targetPlayer = target->GetConnectedPlayer();
 
-            targetPlayer->ResurrectPlayer(1.0f);
+            targetPlayer->ResurrectPlayer(!AccountMgr::IsPlayerAccount(targetPlayer->GetSession()->GetSecurity()) ? 1.0f : 1.0f);
             targetPlayer->SpawnCorpseBones();
             targetPlayer->SaveToDB(false, false);
         }
@@ -1112,6 +1113,75 @@ public:
         {
             CharacterDatabaseTransaction trans(nullptr);
             Player::OfflineResurrect(target->GetGUID(), trans);
+        }
+
+        return true;
+    }
+
+    static bool HandleReviveAllCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target || !target->IsConnected())
+        {
+            return false;
+        }
+
+        // check online security
+        if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
+        {
+            return false;
+        }
+
+        auto targetPlayer = target->GetConnectedPlayer();
+
+        Group* group = targetPlayer->GetGroup();
+
+        std::string nameLink = handler->playerLink(target->GetName());
+
+        if (!group)
+        {
+            handler->PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Map* gmMap = handler->GetSession()->GetPlayer()->GetMap();
+        bool toInstance = gmMap->Instanceable();
+
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* player = itr->GetSource();
+
+            if (!player || player == handler->GetSession()->GetPlayer() || !player->GetSession())
+            {
+                continue;
+            }
+
+            // check online security
+            if (handler->HasLowerSecurity(player))
+            {
+                return false;
+            }
+
+            player->ResurrectPlayer(!AccountMgr::IsPlayerAccount(player->GetSession()->GetSecurity()) ? 1.0f : 1.0f);
+            player->CastSpell(player, 48162, true); // Prayer of Fortitude(48162)
+            player->CastSpell(player, 43223, true); // Greater Blessing of Kings(43223)
+            player->CastSpell(player, 48470, true); // Gift of the Wild
+            player->CastSpell(player, 48074, true); // Prayer of Spirit(48074)
+            player->CastSpell(player, 48170, true); // Prayer of Shadow Protection(48170)
+            player->CastSpell(player, 43002, true); // Arcane Brilliance(43002)
+            player->CastSpell(player, 48934, true); // Greater Blessing of Might
+            player->CastSpell(player, 48938, true); // Greater Blessing of Wisdom
+            player->CastSpell(player, 25899, true); // Greater Blessing of Sanctuary
+            player->DurabilityRepairAll(false, 0, false);
+            player->RemoveAllSpellCooldown();
+            player->RemoveAura(57723);
+            player->SpawnCorpseBones();
+            player->SaveToDB(false, false);
         }
 
         return true;
