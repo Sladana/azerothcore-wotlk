@@ -956,7 +956,7 @@ public:
                     events.ScheduleEvent(EVENT_QUAKE_2, 62s + 500ms);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 6s, EVENT_GROUP_ABILITIES);
                     break;
                 default:
                     break;

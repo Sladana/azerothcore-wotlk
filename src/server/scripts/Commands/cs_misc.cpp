@@ -973,7 +973,9 @@ public:
         bool toInstance = gmMap->Instanceable();
 
         // we are in instance, and can summon only player in our group with us as lead
-		if (toInstance && !handler->GetSession()->GetPlayer()->GetGroup())
+        if (toInstance && (
+                    !handler->GetSession()->GetPlayer()->GetGroup() || (group->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()) ||
+                    (handler->GetSession()->GetPlayer()->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID())))
             // the last check is a bit excessive, but let it be, just in case
         {
             handler->SendSysMessage(LANG_CANNOT_SUMMON_TO_INST);
@@ -1156,7 +1158,7 @@ public:
         {
             Player* player = itr->GetSource();
 
-            if (!player || player == handler->GetSession()->GetPlayer() || !player->GetSession())
+            if (!player  || !player->GetSession())
             {
                 continue;
             }
